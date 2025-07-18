@@ -18,6 +18,11 @@ def mock_hash_repository():
 
 
 @pytest.fixture
+def mock_auth_service():
+    return AsyncMock()
+
+
+@pytest.fixture
 def create_mock_user(
     username: str = 'testuser',
     email: str = 'test@example.com',

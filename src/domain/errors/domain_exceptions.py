@@ -25,3 +25,8 @@ class InvalidPageError(DomainException):
 class InvalidPageSizeError(DomainException):
     def __init__(self, message: str = 'Invalid page size'):
         super().__init__(message)
+
+
+class CredentialsError(DomainException):
+    def __init__(self, message: str = 'Invalid credentials'):
+        super().__init__(message)

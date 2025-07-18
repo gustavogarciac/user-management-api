@@ -15,3 +15,13 @@ class UserNotFoundError(DomainException):
 class UserAlreadyExistsError(DomainException):
     def __init__(self, message: str = 'User already exists'):
         super().__init__(message)
+
+
+class InvalidPageError(DomainException):
+    def __init__(self, message: str = 'Invalid page'):
+        super().__init__(message)
+
+
+class InvalidPageSizeError(DomainException):
+    def __init__(self, message: str = 'Invalid page size'):
+        super().__init__(message)

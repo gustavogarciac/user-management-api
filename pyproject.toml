@@ -1,6 +1,6 @@
 [tool.ruff]
 line-length = 79
-extend-exclude = ['src/migrations']
+extend-exclude = ['src/infrastructure/database/migrations']
 
 [tool.ruff.lint]
 preview = true

@@ -7,7 +7,7 @@ from src.infrastructure.database.sqlite_db import init_db
 
 app = FastAPI()
 
-app.include_router(create_user_router)
+app.include_router(create_user_router, prefix='/api/v1', tags=['users'])
 
 
 @app.on_event('startup')

@@ -3,13 +3,17 @@ from typing import Awaitable, Callable
 from uuid import UUID, uuid4
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from src.adapters.api.dependencies.database import get_db_session
+from src.adapters.api.schemas.user import UserResponse
 from src.adapters.repositories.user_repository_implementation import (
     UserRepositoryImplementation,
 )
 from src.infrastructure.database.sqlite_db import Base, UserORM
+from src.main import app
 
 
 @pytest.fixture
@@ -29,10 +33,39 @@ async def async_session():
 
 
 @pytest.fixture
+async def client(async_session):
+    def override_get_db():
+        return async_session
+
+    app.dependency_overrides[get_db_session] = override_get_db
+    return TestClient(app)
+
+
+@pytest.fixture
 async def user_repository(
     async_session: AsyncSession,
 ) -> UserRepositoryImplementation:
     return UserRepositoryImplementation(async_session)
+
+
+@pytest.fixture
+async def make_user_api(client) -> Callable[[], Awaitable[UserResponse]]:
+    async def _make_user_api(
+        username: str = 'testuser',
+        email: str = 'test@example.com',
+        password_hash: str = 'hashed_password',
+    ) -> UserResponse:
+        response = client.post(
+            '/api/v1/users',
+            json={
+                'username': username,
+                'email': email,
+                'password': password_hash,
+            },
+        )
+        return UserResponse.model_validate(response.json())
+
+    return _make_user_api
 
 
 @pytest.fixture

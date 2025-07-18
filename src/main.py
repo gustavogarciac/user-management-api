@@ -2,9 +2,12 @@ from http import HTTPStatus
 
 from fastapi import FastAPI
 
-from infrastructure.database.sqlite_db import init_db
+from src.adapters.api.routers.create_user import router as create_user_router
+from src.infrastructure.database.sqlite_db import init_db
 
 app = FastAPI()
+
+app.include_router(create_user_router)
 
 
 @app.on_event('startup')

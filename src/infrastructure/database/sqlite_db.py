@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as SQLAlchemyUUID
@@ -19,7 +20,7 @@ class Base(DeclarativeBase):
 class UserORM(Base):
     __tablename__ = 'users'
 
-    id = Column(SQLAlchemyUUID, primary_key=True, index=True)
+    id = Column(SQLAlchemyUUID, primary_key=True, index=True, default=uuid4)
     username = Column(String(50), unique=True, index=True)
     email = Column(String, unique=True, index=True)
     password_hash = Column(String)

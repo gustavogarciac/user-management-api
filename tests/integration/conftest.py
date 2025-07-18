@@ -1,5 +1,6 @@
-from typing import Callable
-from uuid import uuid4
+from datetime import datetime
+from typing import Awaitable, Callable
+from uuid import UUID, uuid4
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -53,3 +54,29 @@ async def make_user(async_session: AsyncSession) -> Callable[[], UserORM]:
         return user
 
     return _make_user
+
+
+@pytest.fixture
+async def make_user_orm(
+    async_session: AsyncSession,
+) -> Callable[[UUID | None, str, str, str], Awaitable[UserORM]]:
+    async def _make_user_orm(
+        username: str = 'testuser',
+        email: str = 'test@example.com',
+        password_hash: str = 'hashed_password',
+        created_at: datetime | None = None,
+        id: UUID | None = None,
+    ) -> UserORM:
+        user = UserORM(
+            id=id,
+            username=username,
+            email=email,
+            password_hash=password_hash,
+            created_at=created_at,
+        )
+        async_session.add(user)
+        await async_session.commit()
+        await async_session.refresh(user)
+        return user
+
+    return _make_user_orm

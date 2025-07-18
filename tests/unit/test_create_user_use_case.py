@@ -52,6 +52,35 @@ async def test_create_user_success(
 
 
 @pytest.mark.asyncio
+async def test_create_user_password_being_hashed(
+    create_user_use_case,
+    mock_user_repository,
+    mock_hash_repository,
+):
+    mock_user_repository.get_user_by_email.return_value = None
+    mock_user_repository.get_user_by_username.return_value = None
+    mock_hash_repository.hash_password.return_value = 'hashed_password'
+
+    mock_user_repository.create_user.return_value = User(
+        id=uuid4(),
+        username='testuser',
+        email='test@example.com',
+        password_hash='hashed_password',
+        created_at=datetime.utcnow(),
+    )
+
+    user = await create_user_use_case.execute(
+        username='testuser',
+        email='test@example.com',
+        password='password',
+    )
+
+    assert user.password_hash == 'hashed_password'
+    mock_hash_repository.hash_password.assert_called_once_with('password')
+    mock_user_repository.create_user.assert_called_once()
+
+
+@pytest.mark.asyncio
 async def test_create_user_duplicate_email(
     create_user_use_case,
     mock_user_repository,

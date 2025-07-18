@@ -3,8 +3,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from src.infrastructure.config.settings import settings
-from src.infrastructure.database.sqlite_db import Base
+from infrastructure.config.settings import settings
+from infrastructure.database.sqlite_db import Base
 
 DATABASE_URL_SYNC = settings.DATABASE_URL.replace('sqlite+aiosqlite', 'sqlite')
 

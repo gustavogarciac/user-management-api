@@ -1,9 +1,14 @@
 from http import HTTPStatus
 
 from fastapi import FastAPI
+from infrastructure.database.sqlite_db import init_db
+
 
 app = FastAPI()
 
+@app.on_event('startup')
+async def startup_event():
+    await init_db()
 
 @app.get(
     '/health',

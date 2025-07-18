@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
@@ -27,8 +27,11 @@ def create_mock_user(
     username: str = 'testuser',
     email: str = 'test@example.com',
     password_hash: str = 'hashed_password',
-    created_at: datetime = datetime.utcnow(),
+    created_at: datetime | None = None,
 ) -> User:
+    if created_at is None:
+        created_at = datetime.now(timezone.utc)
+
     return User(
         id=uuid4(),
         username=username,

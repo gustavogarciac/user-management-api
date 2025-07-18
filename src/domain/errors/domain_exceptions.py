@@ -30,3 +30,18 @@ class InvalidPageSizeError(DomainException):
 class CredentialsError(DomainException):
     def __init__(self, message: str = 'Invalid credentials'):
         super().__init__(message)
+
+
+class InvalidOrderDirectionError(DomainException):
+    def __init__(self, message: str = 'Invalid order direction'):
+        super().__init__(message)
+
+
+class InvalidOrderByError(DomainException):
+    def __init__(self, message: str = 'Invalid order by'):
+        super().__init__(message)
+
+
+class InvalidFilterError(DomainException):
+    def __init__(self, message: str = 'Invalid filter'):
+        super().__init__(message)

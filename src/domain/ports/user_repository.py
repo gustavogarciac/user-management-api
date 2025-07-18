@@ -1,10 +1,21 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Optional
 from uuid import UUID
 
 from pydantic import EmailStr
 
 from src.domain.entities.user import User
+
+
+@dataclass
+class ListUsersConfig:
+    page: int
+    page_size: int
+    query: str | None = None
+    order_by: str | None = None
+    order_direction: str | None = None
+    filters: dict[str, str] | None = None
 
 
 class UserRepository(ABC):
@@ -29,5 +40,8 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_users(self, page: int, page_size: int) -> List[User]:
+    async def list_users(
+        self,
+        config: ListUsersConfig,
+    ) -> list[User]:
         pass

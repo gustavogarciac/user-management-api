@@ -112,7 +112,7 @@ async def test_list_users_invalid_page_size(
     list_users_use_case,
     mock_user_repository,
 ):
-    with pytest.raises(InvalidPageError) as exc:
+    with pytest.raises(InvalidPageSizeError) as exc:
         await list_users_use_case.execute(
             ListUsersRequest(
                 page=1,
@@ -122,7 +122,7 @@ async def test_list_users_invalid_page_size(
 
     mock_user_repository.list_users.assert_not_called()
 
-    assert str(exc.value) == 'Page and page_size must be greater than 0'
+    assert str(exc.value) == 'Page size must be greater than 0'
 
 
 @pytest.mark.asyncio
@@ -140,7 +140,7 @@ async def test_list_users_invalid_page_and_page_size_negative(
 
     mock_user_repository.list_users.assert_not_called()
 
-    assert str(exc.value) == 'Page and page_size must be greater than 0'
+    assert str(exc.value) == 'Page must be greater than 0'
 
 
 @pytest.mark.asyncio
@@ -156,7 +156,7 @@ async def test_list_users_invalid_page_and_page_size_zero(
             )
         )
 
-    assert str(exc.value) == 'Page and page_size must be greater than 0'
+    assert str(exc.value) == 'Page must be greater than 0'
 
 
 @pytest.mark.asyncio
@@ -276,7 +276,9 @@ async def test_list_users_with_invalid_order_by(
 
     mock_user_repository.list_users.assert_not_called()
 
-    assert str(exc.value) == "Order by must be ['name', 'email', 'created_at']"
+    assert str(exc.value) == (
+        "Order by must be ['username', 'email', 'created_at']"
+    )
 
 
 @pytest.mark.asyncio
@@ -313,7 +315,6 @@ async def test_list_users_with_query(
         created_at=datetime.now(timezone.utc) + timedelta(days=1),
     )
 
-    # Mock que retorna apenas o usuário que contém 'gustavo' no nome
     mock_user_repository.list_users.return_value = [second_mock_user]
 
     response = await list_users_use_case.execute(

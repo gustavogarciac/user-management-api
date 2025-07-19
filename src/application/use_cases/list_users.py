@@ -25,7 +25,7 @@ class ListUsersUseCase:
         self.user_repository = user_repository
 
     MAXIMUM_PAGE_SIZE = 100
-    ALLOWED_ORDER_BY = ['name', 'email', 'created_at']
+    ALLOWED_ORDER_BY = ['username', 'email', 'created_at']
     ALLOWED_ORDER_DIRECTION = ['asc', 'desc']
     ALLOWED_FILTERS = ['username', 'email']
 
@@ -54,8 +54,11 @@ class ListUsersUseCase:
         }
 
     def _validate_pagination(self, page: int, page_size: int) -> None:
-        if page <= 0 or page_size <= 0:
-            raise InvalidPageError('Page and page_size must be greater than 0')
+        if page <= 0:
+            raise InvalidPageError('Page must be greater than 0')
+
+        if page_size <= 0:
+            raise InvalidPageSizeError('Page size must be greater than 0')
 
         if page_size > self.MAXIMUM_PAGE_SIZE:
             raise InvalidPageSizeError(

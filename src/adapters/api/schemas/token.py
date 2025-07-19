@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class TokenRequest(BaseModel):
@@ -7,5 +7,5 @@ class TokenRequest(BaseModel):
 
 
 class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str
+    access_token: str = Field(..., description='Token JWT de acesso')
+    token_type: str = Field(default='bearer', description='Tipo do token')

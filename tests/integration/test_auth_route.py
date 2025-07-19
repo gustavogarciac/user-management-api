@@ -14,8 +14,8 @@ async def test_authenticate_user_success(async_session, client, make_user_api):
 
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'testuser@example.com',
+        data={
+            'username': 'testuser@example.com',
             'password': 'testpassword123',
         },
     )
@@ -41,8 +41,8 @@ async def test_authenticate_user_invalid_credentials(
 
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'testuser@example.com',
+        data={
+            'username': 'testuser@example.com',
             'password': 'wrongpassword',
         },
     )
@@ -58,8 +58,8 @@ async def test_authenticate_user_user_not_found(
 ):
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'nonexistent@example.com',
+        data={
+            'username': 'nonexistent@example.com',
             'password': 'testpassword123',
         },
     )
@@ -75,8 +75,8 @@ async def test_authenticate_user_invalid_email_format(
 ):
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'invalid-email',
+        data={
+            'username': 'invalid-email',
             'password': 'testpassword123',
         },
     )
@@ -91,7 +91,7 @@ async def test_authenticate_user_missing_email(
 ):
     response = client.post(
         '/api/v1/auth/token',
-        json={
+        data={
             'password': 'testpassword123',
         },
     )
@@ -106,8 +106,8 @@ async def test_authenticate_user_missing_password(
 ):
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'testuser@example.com',
+        data={
+            'username': 'testuser@example.com',
         },
     )
 
@@ -121,7 +121,7 @@ async def test_authenticate_user_empty_request(
 ):
     response = client.post(
         '/api/v1/auth/token',
-        json={},
+        data={},
     )
 
     assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -149,8 +149,8 @@ async def test_authenticate_user_internal_server_error(
 
         response = client.post(
             '/api/v1/auth/token',
-            json={
-                'email': 'testuser@example.com',
+            data={
+                'username': 'testuser@example.com',
                 'password': 'testpassword123',
             },
         )
@@ -173,8 +173,8 @@ async def test_authenticate_user_with_empty_password(
 
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'testuser@example.com',
+        data={
+            'username': 'testuser@example.com',
             'password': '',
         },
     )
@@ -197,8 +197,8 @@ async def test_authenticate_user_with_empty_email(
 
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': '',
+        data={
+            'username': '',
             'password': 'testpassword123',
         },
     )
@@ -220,8 +220,8 @@ async def test_authenticate_user_case_sensitive_email(
 
     response = client.post(
         '/api/v1/auth/token',
-        json={
-            'email': 'TESTUSER@EXAMPLE.COM',
+        data={
+            'username': 'TESTUSER@EXAMPLE.COM',
             'password': 'testpassword123',
         },
     )

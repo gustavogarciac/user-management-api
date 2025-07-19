@@ -3,6 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.adapters.api.dependencies.auth import get_current_user
 from src.adapters.api.dependencies.database import get_db_session
 from src.adapters.api.schemas.user import (
     UserListQueryParams,
@@ -29,6 +30,7 @@ router = APIRouter(prefix='/users', tags=['users'])
     responses={
         HTTPStatus.OK: {'description': 'Users retrieved successfully'},
         HTTPStatus.BAD_REQUEST: {'description': 'Invalid parameters'},
+        HTTPStatus.UNAUTHORIZED: {'description': 'Not authenticated'},
         HTTPStatus.INTERNAL_SERVER_ERROR: {
             'description': 'Internal server error',
         },
@@ -37,6 +39,7 @@ router = APIRouter(prefix='/users', tags=['users'])
 async def list_users(
     session: AsyncSession = Depends(get_db_session),
     params: UserListQueryParams = Depends(),
+    current_user: str = Depends(get_current_user),
 ):
     try:
         list_users = list_users_factory(session)

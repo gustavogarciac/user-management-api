@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.adapters.api.dependencies.auth import get_current_user
 from src.adapters.api.dependencies.database import get_db_session
 from src.adapters.api.schemas.user import UserResponse, UserUpdate
 from src.domain.errors.domain_exceptions import (
@@ -22,6 +23,7 @@ router = APIRouter(prefix='/users', tags=['users'])
     responses={
         HTTPStatus.OK: {'description': 'User updated successfully'},
         HTTPStatus.NOT_FOUND: {'description': 'User not found'},
+        HTTPStatus.UNAUTHORIZED: {'description': 'Not authenticated'},
         HTTPStatus.INTERNAL_SERVER_ERROR: {
             'description': 'Internal server error',
         },
@@ -32,6 +34,7 @@ async def update_user(
     user_id: UUID,
     user: UserUpdate,
     session: AsyncSession = Depends(get_db_session),
+    current_user: str = Depends(get_current_user),
 ):
     try:
         update_user = update_user_factory(session)

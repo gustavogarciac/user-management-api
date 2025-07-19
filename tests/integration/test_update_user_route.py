@@ -6,19 +6,30 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_update_user_success(async_session, client, make_user_api):
+async def test_update_user_success(
+    async_session,
+    client,
+    make_user_api,
+    make_token_api,
+):
     user = await make_user_api(
         username='testuser',
         email='testuser@example.com',
         password_hash='testpassword',
     )
 
+    token = make_token_api('testuser@example.com', 'testpassword')
+
     user_data = {
         'username': 'testuser2',
         'email': 'testuser2@example.com',
     }
 
-    response = client.put(f'/api/v1/users/{user.id}', json=user_data)
+    response = client.put(
+        f'/api/v1/users/{user.id}',
+        json=user_data,
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json()['username'] == user_data['username']
@@ -34,14 +45,27 @@ async def test_update_user_not_found(
     async_session,
     client,
     make_user_api,
+    make_token_api,
 ):
+    await make_user_api(
+        username='testuser',
+        email='testuser@example.com',
+        password_hash='testpassword',
+    )
+
+    token = make_token_api('testuser@example.com', 'testpassword')
+
     random_id = uuid4()
     user_data = {
         'username': 'testuser2',
         'email': 'testuser2@example.com',
     }
 
-    response = client.put(f'/api/v1/users/{random_id}', json=user_data)
+    response = client.put(
+        f'/api/v1/users/{random_id}',
+        json=user_data,
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json()['detail'] == f'User with id {random_id} not found'
@@ -52,11 +76,12 @@ async def test_update_user_duplicate_email(
     async_session,
     client,
     make_user_api,
+    make_token_api,
 ):
     user = await make_user_api(
         username='testuser',
         email='testuser@example.com',
-        password_hash='testpassword2',
+        password_hash='testpassword',
     )
 
     await make_user_api(
@@ -65,12 +90,18 @@ async def test_update_user_duplicate_email(
         password_hash='testpassword2',
     )
 
+    token = make_token_api('testuser@example.com', 'testpassword')
+
     user_data = {
         'username': 'testuser3',
         'email': 'testuser2@example.com',
     }
 
-    response = client.put(f'/api/v1/users/{user.id}', json=user_data)
+    response = client.put(
+        f'/api/v1/users/{user.id}',
+        json=user_data,
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json()['detail'] == (
@@ -83,12 +114,15 @@ async def test_update_user_duplicate_username(
     async_session,
     client,
     make_user_api,
+    make_token_api,
 ):
     user = await make_user_api(
         username='testuser',
         email='testuser@example.com',
-        password_hash='testpassword2',
+        password_hash='testpassword',
     )
+
+    token = make_token_api('testuser@example.com', 'testpassword')
 
     await make_user_api(
         username='testuser2',
@@ -101,7 +135,11 @@ async def test_update_user_duplicate_username(
         'email': 'testuser@example.com',
     }
 
-    response = client.put(f'/api/v1/users/{user.id}', json=user_data)
+    response = client.put(
+        f'/api/v1/users/{user.id}',
+        json=user_data,
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json()['detail'] == (
@@ -113,7 +151,17 @@ async def test_update_user_duplicate_username(
 async def test_update_user_internal_server_error(
     async_session,
     client,
+    make_user_api,
+    make_token_api,
 ):
+    await make_user_api(
+        username='testuser',
+        email='testuser@example.com',
+        password_hash='testpassword',
+    )
+
+    token = make_token_api('testuser@example.com', 'testpassword')
+
     random_id = uuid4()
     user_data = {
         'username': 'testuser2',
@@ -128,7 +176,11 @@ async def test_update_user_internal_server_error(
             'Database connection failed',
         )
 
-        response = client.put(f'/api/v1/users/{random_id}', json=user_data)
+        response = client.put(
+            f'/api/v1/users/{random_id}',
+            json=user_data,
+            headers={'Authorization': f'Bearer {token}'},
+        )
 
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert response.json()['detail'] == 'Database connection failed'

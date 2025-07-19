@@ -18,10 +18,20 @@ async def make_users(make_user_api):
 
 
 @pytest.mark.asyncio
-async def test_list_users_success(async_session, client, make_users):
+async def test_list_users_success(
+    async_session,
+    client,
+    make_users,
+    make_token_api,
+):
     await make_users(3)
 
-    response = client.get('/api/v1/users?page=1&page_size=10')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=1&page_size=10',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     expected_response = {
         'items': [
@@ -55,10 +65,16 @@ async def test_list_users_success_with_pagination(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(11)
 
-    response = client.get('/api/v1/users?page=2&page_size=10')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=2&page_size=10',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     expected_response = {
         'items': [
@@ -88,30 +104,60 @@ async def test_list_users_success_with_pagination(
 
 
 @pytest.mark.asyncio
-async def test_list_users_invalid_page_size(async_session, client, make_users):
+async def test_list_users_invalid_page_size(
+    async_session,
+    client,
+    make_users,
+    make_token_api,
+):
     await make_users(3)
 
-    response = client.get('/api/v1/users?page=1&page_size=0')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=1&page_size=0',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json()['detail'] == 'Page size must be greater than 0'
 
 
 @pytest.mark.asyncio
-async def test_list_users_invalid_page(async_session, client, make_users):
+async def test_list_users_invalid_page(
+    async_session,
+    client,
+    make_users,
+    make_token_api,
+):
     await make_users(3)
 
-    response = client.get('/api/v1/users?page=0&page_size=10')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=0&page_size=10',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json()['detail'] == 'Page must be greater than 0'
 
 
 @pytest.mark.asyncio
-async def test_list_users_invalid_order_by(async_session, client, make_users):
+async def test_list_users_invalid_order_by(
+    async_session,
+    client,
+    make_users,
+    make_token_api,
+):
     await make_users(3)
 
-    response = client.get('/api/v1/users?page=1&page_size=10&order_by=invalid')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=1&page_size=10&order_by=invalid',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json()['detail'] == (
@@ -124,11 +170,15 @@ async def test_list_users_invalid_order_direction(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_direction=invalid',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -142,7 +192,16 @@ async def test_list_users_internal_server_error(
     async_session,
     client,
     make_user_api,
+    make_token_api,
 ):
+    await make_user_api(
+        username='testuser',
+        email='testuser@example.com',
+        password_hash='testpassword',
+    )
+
+    token = make_token_api('testuser@example.com', 'testpassword')
+
     with patch(
         'src.adapters.api.routers.list_users.list_users_factory',
     ) as mock_factory:
@@ -151,7 +210,10 @@ async def test_list_users_internal_server_error(
             'Database connection failed',
         )
 
-        response = client.get('/api/v1/users?page=1&page_size=10')
+        response = client.get(
+            '/api/v1/users?page=1&page_size=10',
+            headers={'Authorization': f'Bearer {token}'},
+        )
 
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
         assert response.json()['detail'] == 'Database connection failed'
@@ -162,11 +224,15 @@ async def test_list_users_with_username_filter(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&username=testuser2',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 1
@@ -182,11 +248,15 @@ async def test_list_users_with_email_filter(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&email=testuser3@example.com',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 1
@@ -202,11 +272,15 @@ async def test_list_users_with_multiple_filters(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&username=testuser1&email=testuser1@example.com',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 1
@@ -223,10 +297,16 @@ async def test_list_users_with_query_search(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
-    response = client.get('/api/v1/users?page=1&page_size=10&query=testuser2')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=1&page_size=10&query=testuser2',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.OK
     data = response.json()
@@ -243,11 +323,15 @@ async def test_list_users_with_empty_query(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&query=',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -262,11 +346,15 @@ async def test_list_users_with_query_no_results(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&query=nonexistent',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -280,11 +368,15 @@ async def test_list_users_ordered_by_username_asc(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_by=username&order_direction=asc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -301,11 +393,15 @@ async def test_list_users_ordered_by_username_desc(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_by=username&order_direction=desc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -322,11 +418,15 @@ async def test_list_users_ordered_by_email_asc(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_by=email&order_direction=asc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -343,11 +443,15 @@ async def test_list_users_ordered_by_email_desc(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_by=email&order_direction=desc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -364,11 +468,15 @@ async def test_list_users_ordered_by_created_at_asc(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_by=created_at&order_direction=asc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -383,11 +491,15 @@ async def test_list_users_ordered_by_created_at_desc(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&order_by=created_at&order_direction=desc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     expected_length = 3
@@ -402,18 +514,47 @@ async def test_list_users_page_size_exceeds_maximum(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
-    response = client.get('/api/v1/users?page=1&page_size=101')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=1&page_size=101',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json()['detail'] == 'Page size must be less than 100'
 
 
 @pytest.mark.asyncio
-async def test_list_users_empty_list(async_session, client):
-    response = client.get('/api/v1/users?page=1&page_size=10')
+async def test_list_users_empty_list(
+    async_session,
+    client,
+    make_user_api,
+    make_token_api,
+):
+    user = await make_user_api(
+        username='testuser',
+        email='testuser@example.com',
+        password_hash='testpassword',
+    )
+
+    token = make_token_api('testuser@example.com', 'testpassword')
+
+    delete_user = client.delete(
+        f'/api/v1/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert delete_user.status_code == HTTPStatus.OK
+
+    response = client.get(
+        '/api/v1/users?page=1&page_size=10',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     expected_response = {
         'items': [],
@@ -435,10 +576,16 @@ async def test_list_users_with_default_parameters(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(3)
 
-    response = client.get('/api/v1/users')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     expected_response = {
         'items': [
@@ -476,10 +623,16 @@ async def test_list_users_pagination_exceeds_total(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
-    response = client.get('/api/v1/users?page=10&page_size=10')
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
+    response = client.get(
+        '/api/v1/users?page=10&page_size=10',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     expected_response = {
         'items': [],
@@ -501,8 +654,11 @@ async def test_list_users_combined_filters_and_ordering(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
+
+    token = make_token_api('testuser0@example.com', 'testpassword')
 
     query_params = {
         'page': 1,
@@ -515,6 +671,7 @@ async def test_list_users_combined_filters_and_ordering(
     response = client.get(
         '/api/v1/users',
         params=query_params,
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -528,11 +685,15 @@ async def test_list_users_combined_query_and_ordering(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&query=testuser&order_by=email&order_direction=desc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -545,11 +706,15 @@ async def test_list_users_combined_filters_query_and_ordering(
     async_session,
     client,
     make_users,
+    make_token_api,
 ):
     await make_users(5)
 
+    token = make_token_api('testuser0@example.com', 'testpassword')
+
     response = client.get(
         '/api/v1/users?page=1&page_size=10&username=testuser&query=testuser&order_by=username&order_direction=asc',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -560,9 +725,14 @@ async def test_list_users_combined_filters_query_and_ordering(
 
 @pytest.mark.asyncio
 async def test_list_users_invalid_filter_error(
-    async_session, client, make_users
+    async_session,
+    client,
+    make_users,
+    make_token_api,
 ):
     await make_users(3)
+
+    token = make_token_api('testuser0@example.com', 'testpassword')
 
     with patch(
         'src.adapters.api.routers.list_users.list_users_factory',
@@ -572,6 +742,7 @@ async def test_list_users_invalid_filter_error(
 
         response = client.get(
             '/api/v1/users?page=1&page_size=10&invalid_filter=value',
+            headers={'Authorization': f'Bearer {token}'},
         )
 
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

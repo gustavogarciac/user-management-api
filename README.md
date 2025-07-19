@@ -47,6 +47,10 @@ src/
 
 ## 📋 Requisitos
 
+### Versão do Python
+
+Este projeto foi desenvolvido e testado com **Python 3.10**. Recomenda-se usar essa versão para garantir compatibilidade total, pois utiliza recursos como o operador de união de tipos (`|`) introduzido no Python 3.10. Para gerenciar a versão do Python, utilize ferramentas como `pyenv` ou instale a versão específica no seu sistema.
+
 ### Dependências de Produção
 
 - **Python 3.10+**: Linguagem base do projeto

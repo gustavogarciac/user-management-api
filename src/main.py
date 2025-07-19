@@ -26,7 +26,21 @@ async def startup_event():
 
 
 @app.get(
+    '/',
+    tags=['root'],
+    status_code=HTTPStatus.OK,
+    responses={HTTPStatus.OK: {'description': 'OK'}},
+)
+async def root():
+    return {
+        'message': 'API is running. you can use /docs',
+        'status': 'ok',
+    }
+
+
+@app.get(
     '/health',
+    tags=['health'],
     status_code=HTTPStatus.OK,
     responses={HTTPStatus.OK: {'description': 'OK'}},
 )

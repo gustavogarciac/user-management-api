@@ -69,6 +69,22 @@ async def make_user_api(client) -> Callable[[], Awaitable[UserResponse]]:
 
 
 @pytest.fixture
+async def make_token_api(client):
+    def _make_token_api(email: str, password: str) -> str:
+        response = client.post(
+            '/api/v1/auth/token',
+            data={
+                'username': email,
+                'password': password,
+            },
+        )
+
+        return response.json()['access_token']
+
+    return _make_token_api
+
+
+@pytest.fixture
 async def make_user(async_session: AsyncSession) -> Callable[[], UserORM]:
     async def _make_user(
         username: str = 'testuser',

@@ -70,7 +70,7 @@ src/
 ### 1. Clone o Repositório
 
 ```bash
-git clone <url-do-repositório>
+git clone https://github.com/gustavogarciac/user-management-api.git
 cd user-management-api
 ```
 

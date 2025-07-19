@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from fastapi import FastAPI
 
+from src.adapters.api.routers.auth import router as auth_router
 from src.adapters.api.routers.create_user import router as create_user_router
 from src.adapters.api.routers.delete_user import router as delete_user_router
 from src.adapters.api.routers.get_user import router as get_user_router
@@ -16,6 +17,7 @@ app.include_router(get_user_router, prefix='/api/v1', tags=['users'])
 app.include_router(delete_user_router, prefix='/api/v1', tags=['users'])
 app.include_router(update_user_router, prefix='/api/v1', tags=['users'])
 app.include_router(list_users_router, prefix='/api/v1', tags=['users'])
+app.include_router(auth_router, prefix='/api/v1', tags=['auth'])
 
 
 @app.on_event('startup')

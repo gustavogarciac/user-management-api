@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.adapters.auth.jwt_auth_service import JwtAuthService
+from src.adapters.auth.jwt_auth_service import JWTAuthenticationService
 from src.adapters.auth.pwdlib_password_hasher import PwdlibPasswordHasher
 from src.adapters.repositories.user_repository_implementation import (
     UserRepositoryImplementation,
@@ -13,6 +13,6 @@ def authenticate_user_factory(
 ) -> AuthenticateUserUseCase:
     user_repository = UserRepositoryImplementation(session)
     hash_service = PwdlibPasswordHasher()
-    auth_service = JwtAuthService()
+    auth_service = JWTAuthenticationService()
 
     return AuthenticateUserUseCase(user_repository, hash_service, auth_service)

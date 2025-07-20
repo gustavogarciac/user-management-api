@@ -110,14 +110,36 @@ JWT_SECRET_KEY=sua_chave_secreta_muito_segura_aqui
 JWT_EXPIRATION_MINUTES=30
 ```
 
-### 5. Execute as Migrações do Banco
+### 5. Crie o Banco de Dados
+
+O projeto usa SQLite por padrão, mas suporta outros bancos através da variável `DATABASE_URL`. Para criar o banco:
 
 ```bash
-# Inicialize o Alembic (primeira vez)
-alembic init src/infrastructure/database/migrations
+# Crie o diretório para o banco (se não existir)
+mkdir -p data
 
-# Execute as migrações
+# Para SQLite (padrão)
+# O banco será criado automaticamente em ./data/users.db
+# conforme definido no DATABASE_URL
+
+# Para PostgreSQL (opcional)
+# DATABASE_URL=postgresql+asyncpg://user:password@localhost/dbname
+
+# Para MySQL (opcional)
+# DATABASE_URL=mysql+aiomysql://user:password@localhost/dbname
+```
+
+### 6. Execute as Migrações do Banco
+
+```bash
+# Execute as migrações para criar as tabelas
 alembic upgrade head
+
+# Para verificar o status das migrações
+alembic current
+
+# Para gerar uma nova migração (se necessário)
+alembic revision --autogenerate -m "description"
 ```
 
 ## 🚀 Executando a Aplicação

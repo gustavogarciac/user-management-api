@@ -2,6 +2,22 @@
 
 API REST para gerenciamento de usuários construída com **FastAPI**, **SQLite**, e seguindo a **arquitetura hexagonal (ports and adapters)**. Este projeto demonstra práticas modernas de desenvolvimento Python, incluindo autenticação segura com JWT, operações CRUD completas com paginação avançada, testes abrangentes (unitários e de integração), e documentação automática via Swagger/OpenAPI.
 
+## 🟢 Deploy funcional para testes:
+
+Você pode acessar ao servidor totalmente online, com deploy realizado na AWS EC2 (Elastic Compute Cloud), e interagir com a sua documentação.
+Você também pode acessar à demonstração de interface, que foi construída utilizando React.js e Next.js.
+
+### 🔗 Links de Acesso:
+
+- **📚 Documentação da API**: [Clique aqui](http://54.94.12.212/docs)
+- **🎨 Interface de Demonstração**: [https://user-management-interface-one.vercel.app/](https://user-management-interface-one.vercel.app/)
+
+### 🖼️ Preview da Interface:
+
+![User Management Interface](demo.png)
+
+_Interface de demonstração do sistema de gerenciamento de usuários_
+
 ## 🚀 Funcionalidades
 
 - **🔐 Autenticação Segura**: Sistema de login com tokens JWT e proteção de rotas

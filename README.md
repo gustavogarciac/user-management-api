@@ -147,7 +147,7 @@ alembic revision --autogenerate -m "description"
 ### Desenvolvimento Local
 
 ```bash
-# Usando taskipy (recomendado)
+# Usando taskipy (recomendado) (é necessário instalar dependências de desenvolvimento)
 task run
 
 # Ou diretamente com FastAPI

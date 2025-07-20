@@ -10,7 +10,17 @@ from src.adapters.api.routers.list_users import router as list_users_router
 from src.adapters.api.routers.update_user import router as update_user_router
 from src.infrastructure.database.sqlite_db import init_db
 
-app = FastAPI()
+app = FastAPI(
+    title='User Management API',
+    description='API for managing users',
+    version='1.0.0',
+    contact={
+        'name': 'Gustavo Garcia',
+        'email': 'gustavogarciac@gmail.com',
+    },
+    openapi_url='/openapi.json',
+    docs_url='/docs',
+)
 
 app.include_router(create_user_router, prefix='/api/v1', tags=['users'])
 app.include_router(get_user_router, prefix='/api/v1', tags=['users'])

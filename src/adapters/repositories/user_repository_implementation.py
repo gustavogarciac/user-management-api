@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from pydantic import EmailStr
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.entities.user import User
@@ -82,7 +82,10 @@ class UserRepositoryImplementation(UserRepository):
         query = select(UserORM)
 
         if config.query:
-            query = query.where(UserORM.username.ilike(f'%{config.query}%'))
+            query = query.where(
+                UserORM.username.ilike(f'%{config.query}%')
+                | UserORM.email.ilike(f'%{config.query}%')
+            )
 
         if config.filters:
             for key, value in config.filters.items():
@@ -103,3 +106,16 @@ class UserRepositoryImplementation(UserRepository):
         users_orm = result.scalars().all()
 
         return [User(**user.__dict__) for user in users_orm]
+
+    async def count_users(self, config: ListUsersConfig) -> int:
+        query = select(func.count(UserORM.id))
+
+        if config.query:
+            query = query.where(UserORM.username.ilike(f'%{config.query}%'))
+
+        if config.filters:
+            for key, value in config.filters.items():
+                query = query.where(getattr(UserORM, key) == value)
+
+        result = await self.session.execute(query)
+        return result.scalar()

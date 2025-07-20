@@ -37,6 +37,7 @@ async def test_list_users_success(
     mock_user = create_mock_user
 
     mock_user_repository.list_users.return_value = [mock_user]
+    mock_user_repository.count_users.return_value = 1
 
     response = await list_users_use_case.execute(
         ListUsersRequest(
@@ -67,6 +68,7 @@ async def test_list_users_empty(
     mock_user_repository,
 ):
     mock_user_repository.list_users.return_value = []
+    mock_user_repository.count_users.return_value = 0
 
     response = await list_users_use_case.execute(
         ListUsersRequest(
@@ -194,6 +196,7 @@ async def test_list_users_with_order_by(
         first_mock_user,
         second_mock_user,
     ]
+    mock_user_repository.count_users.return_value = 2
 
     response = await list_users_use_case.execute(
         ListUsersRequest(
@@ -236,6 +239,7 @@ async def test_list_users_with_order_by_and_order_direction(
         second_mock_user,
         first_mock_user,
     ]
+    mock_user_repository.count_users.return_value = 2
 
     response = await list_users_use_case.execute(
         ListUsersRequest(
@@ -316,6 +320,7 @@ async def test_list_users_with_query(
     )
 
     mock_user_repository.list_users.return_value = [second_mock_user]
+    mock_user_repository.count_users.return_value = 1
 
     response = await list_users_use_case.execute(
         ListUsersRequest(
@@ -354,6 +359,7 @@ async def test_list_users_with_filters(
     mock_user_repository.list_users.return_value = [
         second_mock_user,
     ]
+    mock_user_repository.count_users.return_value = 1
 
     response = await list_users_use_case.execute(
         ListUsersRequest(

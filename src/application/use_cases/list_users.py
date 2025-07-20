@@ -45,10 +45,11 @@ class ListUsersUseCase:
         )
 
         users = await self.user_repository.list_users(config)
+        total_items = await self.user_repository.count_users(config)
 
         return {
             'items': users,
-            'total_items': len(users),
+            'total_items': total_items,
             'page': request.page,
             'page_size': request.page_size,
         }

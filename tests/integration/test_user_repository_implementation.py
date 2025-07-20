@@ -255,3 +255,81 @@ async def test_list_users_with_order_by_and_order_direction(
 
     assert result[0].username == 'auser'
     assert result[1].username == 'buser'
+
+
+@pytest.mark.asyncio
+async def test_count_users_total(
+    user_repository: UserRepositoryImplementation,
+    make_user,
+):
+    for i in range(5):
+        await make_user(
+            username=f'user{i}',
+            email=f'user{i}@example.com',
+        )
+
+    config = ListUsersConfig(page=1, page_size=10)
+    total = await user_repository.count_users(config)
+
+    expected_total = 5
+
+    assert total == expected_total
+
+
+@pytest.mark.asyncio
+async def test_count_users_with_query(
+    user_repository: UserRepositoryImplementation,
+    make_user,
+):
+    # Arrange
+    await make_user(username='testuser', email='test@example.com')
+    await make_user(username='otheruser', email='other@example.com')
+
+    # Act
+    config = ListUsersConfig(page=1, page_size=10, query='test')
+    total = await user_repository.count_users(config)
+
+    # Assert
+    assert total == 1
+
+
+@pytest.mark.asyncio
+async def test_count_users_with_filters(
+    user_repository: UserRepositoryImplementation,
+    make_user,
+):
+    # Arrange
+    await make_user(username='user1', email='user1@example.com')
+    await make_user(username='user2', email='user2@example.com')
+
+    # Act
+    config = ListUsersConfig(
+        page=1, page_size=10, filters={'username': 'user1'}
+    )
+    total = await user_repository.count_users(config)
+
+    # Assert
+    assert total == 1
+
+
+@pytest.mark.asyncio
+async def test_count_users_with_query_and_filters(
+    user_repository: UserRepositoryImplementation,
+    make_user,
+):
+    # Arrange
+    await make_user(username='testuser1', email='test1@example.com')
+    await make_user(username='testuser2', email='test2@example.com')
+    await make_user(username='otheruser', email='other@example.com')
+
+    # Act
+    config = ListUsersConfig(
+        page=1,
+        page_size=10,
+        query='test',
+        filters={'email': 'test1@example.com'},
+    )
+    total = await user_repository.count_users(config)
+
+    # Assert
+    assert total == 1

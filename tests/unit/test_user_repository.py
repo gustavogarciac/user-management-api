@@ -76,6 +76,16 @@ async def test_list_users_abstract_method(mock_repository, list_config):
     assert result == []
 
 
+@pytest.mark.asyncio
+async def test_count_users_abstract_method(mock_repository, list_config):
+    mock_repository.count_users.return_value = 5
+    result = await mock_repository.count_users(list_config)
+
+    expected_result = 5
+
+    assert result == expected_result
+
+
 def test_list_users_config_dataclass():
     config = ListUsersConfig(page=1, page_size=10)
 

@@ -84,7 +84,7 @@ async def test_list_users_success_with_pagination(
                 'email': 'testuser10@example.com',
             },
         ],
-        'total_items': 1,
+        'total_items': 11,
         'page': 2,
         'page_size': 10,
     }
@@ -636,7 +636,7 @@ async def test_list_users_pagination_exceeds_total(
 
     expected_response = {
         'items': [],
-        'total_items': 0,
+        'total_items': 5,
         'page': 10,
         'page_size': 10,
     }

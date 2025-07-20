@@ -49,3 +49,10 @@ class UserRepository(ABC):
         config: ListUsersConfig,
     ) -> list[User]:
         pass
+
+    @abstractmethod
+    async def count_users(
+        self,
+        config: ListUsersConfig,
+    ) -> int:
+        pass
